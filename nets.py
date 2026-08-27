@@ -60,14 +60,13 @@ def input_dim(s):
     return s["order"] * (4 if s["use_xy"] else 2)
 
 
-def build_model(s, width, lr):
-    # two hidden layers is enough to learn a 64x64 image on cpu
+def build_model(s, width, depth, lr):
+    # depth is the number of hidden layers, two is enough for a 64x64 image
     model = keras.Sequential(name=s["kind"])
     model.add(layers.Input(shape=(input_dim(s),)))
-    model.add(layers.Dense(width))
-    add_activation(model, s["act"])
-    model.add(layers.Dense(width))
-    add_activation(model, s["act"])
+    for _ in range(depth):
+        model.add(layers.Dense(width))
+        add_activation(model, s["act"])
     model.add(layers.Dense(1))
     add_activation(model, s["out_act"])
     model.compile(optimizer=keras.optimizers.Adam(learning_rate=lr), loss="mse")

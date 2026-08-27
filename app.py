@@ -95,6 +95,8 @@ class App:
         self.render_var = tk.StringVar(value="5")
         self.width_var = tk.StringVar(value="64")
         self.width_var.trace_add("write", lambda a, b, c: self.schedule_rebuild(None))
+        self.depth_var = tk.StringVar(value="2")
+        self.depth_var.trace_add("write", lambda a, b, c: self.schedule_rebuild(None))
         self.lr_var = tk.StringVar(value="0.001")
         self.lr_var.trace_add("write", lambda a, b, c: self.schedule_lr())
 
@@ -103,6 +105,7 @@ class App:
         add_spin(side, "batch", self.batch_var, lo=32, hi=4096, step=32)
         add_spin(side, "render every", self.render_var, lo=1, hi=500, step=1)
         add_spin(side, "net width", self.width_var, lo=16, hi=256, step=8)
+        add_spin(side, "hidden layers", self.depth_var, lo=1, hi=8, step=1)
         add_spin(side, "learning rate", self.lr_var, values=["0.0003", "0.001", "0.003", "0.01"], width=9)
 
     def make_status(self):
@@ -188,8 +191,9 @@ class App:
     def build_net(self, kind):
         s = self.net_settings(kind)
         width = parse_int(self.width_var.get(), 16, 256, 64)
+        depth = parse_int(self.depth_var.get(), 1, 8, 2)
         lr = parse_float(self.lr_var.get(), 0.00001, 1.0, 0.001)
-        model = nets.build_model(s, width, lr)
+        model = nets.build_model(s, width, depth, lr)
         self.states[kind] = {"model": model, "settings": s, "history": [], "photo": None}
         self.show_net_image(kind, imageprep.blank_image())
         if s["out_act"] in ("sigmoid", "relu"):
