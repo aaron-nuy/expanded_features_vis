@@ -159,9 +159,10 @@ class App:
             v["order"] = tk.StringVar(value="4")
             ttk.Spinbox(knobs, textvariable=v["order"], from_=1, to=8, width=7).grid(row=4, column=1, sticky="w", pady=2)
 
-        if kind == "fourier":
-            v["use_xy"] = tk.BooleanVar(value=False)
-            ttk.Checkbutton(knobs, text="use x, y", variable=v["use_xy"]).grid(row=5, column=0, columnspan=2, sticky="w")
+        # every net can take the 2d position instead of the flat index
+        v["use_xy"] = tk.BooleanVar(value=False)
+        check_row = 5 if kind != "raw" else 4
+        ttk.Checkbutton(knobs, text="use x, y", variable=v["use_xy"]).grid(row=check_row, column=0, columnspan=2, sticky="w")
 
         for key in v:
             v[key].trace_add("write", lambda a, b, c, k=kind: self.schedule_rebuild(k))

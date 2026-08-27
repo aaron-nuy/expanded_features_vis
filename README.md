@@ -12,10 +12,11 @@ network weights
 the three networks differ only in how the pixel position is expanded into
 input features
 
-- raw index: just the flattened position (y * width + x) as a single number
-- taylor features: the position expanded as a power series 1, z, z^2, z^3 ...
+- raw index: just the position as a number, either the flat index or x and y
+- taylor features: the position as a power series 1, z, z^2, z^3 ... and in
+  two variables with cross terms when the x and y box is checked
 - fourier features: sin and cos of the position at frequencies 1, 2, 4, 8 ...
-  optionally taken from the x and y coordinates instead of the flat index
+  either from the flat index or from the x and y coordinates
 
 start training and watch which representation picks up shape and detail
 first. everything runs locally on cpu with keras

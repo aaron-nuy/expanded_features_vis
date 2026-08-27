@@ -29,7 +29,18 @@ def make_features(s, z, x, y):
     # s carries kind, order, use_xy, zero_centered and scale for one network
     cols = []
     if s["kind"] == "raw":
-        cols.append(normalize(z, num_pixels - 1, s["zero_centered"], s["scale"]))
+        if s["use_xy"]:
+            cols.append(normalize(x, size - 1, s["zero_centered"], s["scale"]))
+            cols.append(normalize(y, size - 1, s["zero_centered"], s["scale"]))
+        else:
+            cols.append(normalize(z, num_pixels - 1, s["zero_centered"], s["scale"]))
+    elif s["kind"] == "taylor" and s["use_xy"]:
+        # the 2 variable taylor series cut off at total degree order
+        xn = normalize(x, size - 1, s["zero_centered"], s["scale"])
+        yn = normalize(y, size - 1, s["zero_centered"], s["scale"])
+        for d in range(s["order"] + 1):
+            for a in range(d, -1, -1):
+                cols.append((xn ** a) * (yn ** (d - a)))
     elif s["kind"] == "taylor":
         zn = normalize(z, num_pixels - 1, s["zero_centered"], s["scale"])
         for p in range(s["order"] + 1):
@@ -54,8 +65,11 @@ def make_features(s, z, x, y):
 
 def input_dim(s):
     if s["kind"] == "raw":
-        return 1
+        return 2 if s["use_xy"] else 1
     if s["kind"] == "taylor":
+        if s["use_xy"]:
+            # the terms of total degree up to order, order 4 gives 15
+            return (s["order"] + 1) * (s["order"] + 2) // 2
         return s["order"] + 1
     return s["order"] * (4 if s["use_xy"] else 2)
 
