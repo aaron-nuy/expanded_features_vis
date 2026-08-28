@@ -238,9 +238,14 @@ class App:
         self.start_btn.config(state=tk.NORMAL)
 
     def reset(self):
+        # reset also stops training
+        self.running = False
         self.steps = 0
         for kind in nets.kinds:
             self.build_net(kind)
+        if self.image is not None:
+            self.start_btn.config(state=tk.NORMAL)
+            self.pause_btn.config(state=tk.DISABLED)
 
     def schedule_rebuild(self, kind):
         if self.rebuild_job is not None:
