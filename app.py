@@ -190,7 +190,7 @@ class App:
         width = parse_int(self.width_var.get(), 16, 256, 64)
         lr = parse_float(self.lr_var.get(), 0.00001, 1.0, 0.001)
         model = nets.build_model(s, width, lr)
-        self.states[kind] = {"model": model, "history": [], "photo": None}
+        self.states[kind] = {"model": model, "settings": s, "history": [], "photo": None}
         self.show_net_image(kind, imageprep.blank_image())
         if s["out_act"] in ("sigmoid", "relu"):
             # these can only output zero and above so dark targets are out of reach
@@ -291,7 +291,8 @@ class App:
         render_every = parse_int(self.render_var.get(), 1, 500, 5)
         for kind in nets.kinds:
             state = self.states[kind]
-            feats = nets.make_features(self.net_settings(kind), self.z, self.x, self.y)
+            # the settings the model was built with, not the live knob values
+            feats = nets.make_features(state["settings"], self.z, self.x, self.y)
             hist = state["model"].fit(feats, self.image, epochs=1, batch_size=batch, verbose=0)
             state["history"].append(float(hist.history["loss"][0]))
         self.steps += 1
@@ -302,7 +303,7 @@ class App:
     def render_outputs(self):
         for kind in nets.kinds:
             state = self.states[kind]
-            feats = nets.make_features(self.net_settings(kind), self.z, self.x, self.y)
+            feats = nets.make_features(state["settings"], self.z, self.x, self.y)
             pred = state["model"].predict(feats, verbose=0).flatten()
             self.show_net_image(kind, imageprep.to_image(pred))
 
