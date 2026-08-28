@@ -6,6 +6,7 @@ size = 64
 num_pixels = size * size
 kinds = ["raw", "taylor", "fourier"]
 activations = ["leaky_relu", "relu", "tanh", "sigmoid"]
+output_activations = ["tanh", "leaky_relu", "relu", "sigmoid", "linear"]
 
 
 def coords():
@@ -67,7 +68,8 @@ def build_model(s, width, lr):
     add_activation(model, s["act"])
     model.add(layers.Dense(width))
     add_activation(model, s["act"])
-    model.add(layers.Dense(1, activation="tanh"))
+    model.add(layers.Dense(1))
+    add_activation(model, s["out_act"])
     model.compile(optimizer=keras.optimizers.Adam(learning_rate=lr), loss="mse")
     return model
 
@@ -75,5 +77,7 @@ def build_model(s, width, lr):
 def add_activation(model, act):
     if act == "leaky_relu":
         model.add(layers.LeakyReLU(negative_slope=0.2))
+    elif act == "linear":
+        model.add(layers.Activation("linear"))
     else:
         model.add(layers.Activation(act))

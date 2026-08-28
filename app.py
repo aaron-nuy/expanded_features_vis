@@ -142,18 +142,22 @@ class App:
         v["scale"] = tk.StringVar(value="pi" if kind == "fourier" else "1")
         ttk.Combobox(knobs, textvariable=v["scale"], values=["1", "pi"], width=7, state="readonly").grid(row=1, column=1, sticky="w", pady=2)
 
-        ttk.Label(knobs, text="act").grid(row=2, column=0, sticky="w", pady=2)
+        ttk.Label(knobs, text="hidden").grid(row=2, column=0, sticky="w", pady=2)
         v["act"] = tk.StringVar(value="leaky_relu")
         ttk.Combobox(knobs, textvariable=v["act"], values=nets.activations, width=11, state="readonly").grid(row=2, column=1, sticky="w", pady=2)
 
+        ttk.Label(knobs, text="out").grid(row=3, column=0, sticky="w", pady=2)
+        v["out_act"] = tk.StringVar(value="tanh")
+        ttk.Combobox(knobs, textvariable=v["out_act"], values=nets.output_activations, width=11, state="readonly").grid(row=3, column=1, sticky="w", pady=2)
+
         if kind != "raw":
-            ttk.Label(knobs, text="order").grid(row=3, column=0, sticky="w", pady=2)
+            ttk.Label(knobs, text="order").grid(row=4, column=0, sticky="w", pady=2)
             v["order"] = tk.StringVar(value="4")
-            ttk.Spinbox(knobs, textvariable=v["order"], from_=1, to=8, width=7).grid(row=3, column=1, sticky="w", pady=2)
+            ttk.Spinbox(knobs, textvariable=v["order"], from_=1, to=8, width=7).grid(row=4, column=1, sticky="w", pady=2)
 
         if kind == "fourier":
             v["use_xy"] = tk.BooleanVar(value=False)
-            ttk.Checkbutton(knobs, text="use x, y", variable=v["use_xy"]).grid(row=4, column=0, columnspan=2, sticky="w")
+            ttk.Checkbutton(knobs, text="use x, y", variable=v["use_xy"]).grid(row=5, column=0, columnspan=2, sticky="w")
 
         for key in v:
             v[key].trace_add("write", lambda a, b, c, k=kind: self.schedule_rebuild(k))
@@ -177,6 +181,7 @@ class App:
             "zero_centered": v["norm"].get() == "-1..1",
             "scale": math.pi if v["scale"].get() == "pi" else 1.0,
             "act": v["act"].get(),
+            "out_act": v["out_act"].get() if "out_act" in v else "tanh",
         }
 
     def build_net(self, kind):
