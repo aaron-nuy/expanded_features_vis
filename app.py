@@ -34,14 +34,14 @@ def parse_float(text, lo, hi, default):
     return max(lo, min(hi, value))
 
 
-def add_spin(parent, label, var, values=None, lo=None, hi=None, step=1):
+def add_spin(parent, label, var, values=None, lo=None, hi=None, step=1, width=8):
     box = ttk.Frame(parent)
     box.pack(side=tk.LEFT, padx=6)
     ttk.Label(box, text=label).pack(side=tk.LEFT)
     if values is not None:
-        ttk.Combobox(box, textvariable=var, values=values, width=8).pack(side=tk.LEFT, padx=4)
+        ttk.Combobox(box, textvariable=var, values=values, width=width).pack(side=tk.LEFT, padx=4)
     else:
-        ttk.Spinbox(box, textvariable=var, from_=lo, to=hi, increment=step, width=8).pack(side=tk.LEFT, padx=4)
+        ttk.Spinbox(box, textvariable=var, from_=lo, to=hi, increment=step, width=width).pack(side=tk.LEFT, padx=4)
 
 
 class App:
@@ -101,7 +101,7 @@ class App:
         add_spin(side, "batch", self.batch_var, lo=32, hi=4096, step=32)
         add_spin(side, "render every", self.render_var, lo=1, hi=500, step=1)
         add_spin(side, "net width", self.width_var, lo=16, hi=256, step=8)
-        add_spin(side, "learning rate", self.lr_var, values=["0.0003", "0.001", "0.003", "0.01"])
+        add_spin(side, "learning rate", self.lr_var, values=["0.0003", "0.001", "0.003", "0.01"], width=9)
 
     def make_status(self):
         self.status = ttk.Label(self.root, text="pick an image to start", padding=(8, 0))
@@ -133,22 +133,22 @@ class App:
         v = {}
         self.knobs[kind] = v
 
-        ttk.Label(knobs, text="norm").grid(row=0, column=0, sticky="w")
+        ttk.Label(knobs, text="norm").grid(row=0, column=0, sticky="w", pady=2)
         v["norm"] = tk.StringVar(value="0..1")
-        ttk.Combobox(knobs, textvariable=v["norm"], values=["0..1", "-1..1"], width=6, state="readonly").grid(row=0, column=1, sticky="w")
+        ttk.Combobox(knobs, textvariable=v["norm"], values=["0..1", "-1..1"], width=7, state="readonly").grid(row=0, column=1, sticky="w", pady=2)
 
-        ttk.Label(knobs, text="scale").grid(row=1, column=0, sticky="w")
+        ttk.Label(knobs, text="scale").grid(row=1, column=0, sticky="w", pady=2)
         v["scale"] = tk.StringVar(value="pi" if kind == "fourier" else "1")
-        ttk.Combobox(knobs, textvariable=v["scale"], values=["1", "pi"], width=6, state="readonly").grid(row=1, column=1, sticky="w")
+        ttk.Combobox(knobs, textvariable=v["scale"], values=["1", "pi"], width=7, state="readonly").grid(row=1, column=1, sticky="w", pady=2)
 
-        ttk.Label(knobs, text="act").grid(row=2, column=0, sticky="w")
+        ttk.Label(knobs, text="act").grid(row=2, column=0, sticky="w", pady=2)
         v["act"] = tk.StringVar(value="leaky_relu")
-        ttk.Combobox(knobs, textvariable=v["act"], values=nets.activations, width=10, state="readonly").grid(row=2, column=1, sticky="w")
+        ttk.Combobox(knobs, textvariable=v["act"], values=nets.activations, width=11, state="readonly").grid(row=2, column=1, sticky="w", pady=2)
 
         if kind != "raw":
-            ttk.Label(knobs, text="order").grid(row=3, column=0, sticky="w")
+            ttk.Label(knobs, text="order").grid(row=3, column=0, sticky="w", pady=2)
             v["order"] = tk.StringVar(value="4")
-            ttk.Spinbox(knobs, textvariable=v["order"], from_=1, to=8, width=6).grid(row=3, column=1, sticky="w")
+            ttk.Spinbox(knobs, textvariable=v["order"], from_=1, to=8, width=7).grid(row=3, column=1, sticky="w", pady=2)
 
         if kind == "fourier":
             v["use_xy"] = tk.BooleanVar(value=False)
