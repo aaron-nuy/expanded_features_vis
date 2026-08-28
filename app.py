@@ -3,6 +3,7 @@ import os
 import tkinter as tk
 from tkinter import filedialog, ttk
 
+import numpy as np
 from PIL import Image, ImageTk
 
 import matplotlib
