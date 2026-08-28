@@ -1,5 +1,6 @@
 import math
 import os
+import traceback
 import tkinter as tk
 from tkinter import filedialog, ttk
 
@@ -191,6 +192,9 @@ class App:
         model = nets.build_model(s, width, lr)
         self.states[kind] = {"model": model, "history": [], "photo": None}
         self.show_net_image(kind, imageprep.blank_image())
+        if s["out_act"] in ("sigmoid", "relu"):
+            # these can only output zero and above so dark targets are out of reach
+            self.status.config(text="heads up: %s output %s cannot go below 0, dark pixels are unreachable" % (kind, s["out_act"]))
         self.update_plot()
 
     def show_net_image(self, kind, img):
@@ -273,7 +277,12 @@ class App:
 
     def tick(self):
         if self.running and self.image is not None:
-            self.train_pass()
+            try:
+                self.train_pass()
+            except Exception as err:
+                # a bad pass should never kill the whole loop
+                self.status.config(text="last pass errored: %s" % err)
+                traceback.print_exc()
         self.root.after(50, self.tick)
 
     def train_pass(self):
