@@ -6,3 +6,6 @@ in neural networks, using different expanded features (taylor series, fourier fe
 run with python app.py (needs keras, numpy, pillow, matplotlib and tkinter)
 
 
+<p align="center">
+  <img src="demo.png" width="90%" />
+</p>
